@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpsHardener.dev — Design System & Interactive Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #090d16;
+      --bg-subtle: #0e1424;
+      --bg-surface: #141d33;
+      --bg-surface-hover: #1c2744;
+      --bg-glass: rgba(14, 20, 36, 0.75);
+      
+      --border-subtle: #1e293b;
+      --border-focus: #38bdf8;
+      --border-glow: rgba(56, 189, 248, 0.25);
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-inverse: #020617;
+
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: #22d3ee;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+
+      --editor-bg: #070a12;
+      --editor-gutter: #0f172a;
+      --editor-line-highlight: #172033;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+      --shadow-glow: 0 0 20px -2px rgba(6, 182, 212, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Subtle Cyber Grid Background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header Navbar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+    }
+
+    .brand-name span {
+      color: var(--accent-cyan);
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--bg-subtle);
+      padding: 0.25rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .nav-tab {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border: none;
+      background: transparent;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-tab.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-tab:hover:not(.active) {
+      color: var(--text-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .privacy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .privacy-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+
+    /* Main Split Layout */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      position: relative;
+      z-index: 1;
+      height: calc(100vh - 61px);
+    }
+
+    /* Left Workbench (Configuration Controls) */
+    .controls-pane {
+      background: var(--bg-canvas);
+      border-right: 1px solid var(--border-subtle);
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .preset-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .preset-chip {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-chip:hover, .preset-chip.active {
+      background: var(--bg-surface-hover);
+      border-color: var(--accent-cyan);
+      color: var(--text-primary);
+    }
+
+    /* Config Cards */
+    .config-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      padding: 0.85rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.015);
+    }
+
+    .card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-body {
+      padding: 1rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-label {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .form-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Form Inputs */
+    .cyber-input, .cyber-select {
+      width: 100%;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 0.55rem 0.75rem;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8125rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .cyber-input:focus, .cyber-select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--border-glow);
+    }
+
+    /* Cyber Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #1e293b;
+      transition: .2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 24px;
+      border: 1px solid #334155;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #94a3b8;
+      transition: .2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: rgba(6, 182, 212, 0.2);
+      border-color: var(--accent-cyan);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+      background-color: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
+    }
+
+    /* Segmented Controls */
+    .segmented-control {
+      display: flex;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .segmented-btn {
+      flex: 1;
+      padding: 0.4rem 0.5rem;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .segmented-btn.active {
+      background: var(--bg-surface);
+      color: var(--accent-cyan);
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Right Monaco / Code Pane */
+    .code-pane {
+      background: var(--editor-bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .editor-topbar {
+      height: 48px;
+      background: var(--bg-canvas);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+    }
+
+    .file-tabs {
+      display: flex;
+      height: 100%;
+      align-items: flex-end;
+    }
+
+    .file-tab {
+      height: 38px;
+      padding: 0 1rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8125rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .file-tab.active {
+      background: var(--editor-bg);
+      color: var(--text-primary);
+      border-bottom-color: var(--accent-cyan);
+      border-top: 1px solid var(--border-subtle);
+      border-left: 1px solid var(--border-subtle);
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .editor-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-action {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--border-focus);
+    }
+
+    .btn-action.btn-primary {
+      background: var(--accent-cyan);
+      color: var(--text-inverse);
+      font-weight: 600;
+      border-color: transparent;
+    }
+
+    .btn-action.btn-primary:hover {
+      background: var(--accent-cyan-glow);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+    }
+
+    /* Code Viewport */
+    .editor-content {
+      flex: 1;
+      padding: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8125rem;
+      line-height: 1.7;
+      overflow: auto;
+      color: #e2e8f0;
+      white-space: pre;
+    }
+
+    /* Syntax Highlighting Mock */
+    .syn-keyword { color: #f43f5e; font-weight: 600; }
+    .syn-directive { color: #38bdf8; }
+    .syn-string { color: #a3e635; }
+    .syn-comment { color: #64748b; font-style: italic; }
+    .syn-number { color: #fb923c; }
+    .syn-var { color: #c084fc; }
+
+    /* Floating Security Score Dial */
+    .score-badge-card {
+      position: absolute;
+      top: 60px;
+      right: 24px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: var(--shadow-md);
+      z-index: 10;
+    }
+
+    .dial-wrapper {
+      position: relative;
+      width: 64px;
+      height: 64px;
+    }
+
+    .dial-svg {
+      transform: rotate(-90deg);
+    }
+
+    .dial-bg {
+      fill: none;
+      stroke: #1e293b;
+      stroke-width: 6;
+    }
+
+    .dial-progress {
+      fill: none;
+      stroke: var(--accent-emerald);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 175.9;
+      stroke-dashoffset: 8.8; /* 95% */
+      transition: stroke-dashoffset 0.5s ease;
+      filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6));
+    }
+
+    .dial-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--accent-emerald);
+    }
+
+    .score-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .score-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .score-grade {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Google AdSense & Sponsor Units */
+    .adsense-card {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--border-subtle);
+      border-radius: 12px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .adsense-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .adsense-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .adsense-body {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.85rem;
+    }
+
+    .adsense-mock-ad {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .adsense-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .adsense-info {
+      flex: 1;
+    }
+
+    .adsense-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .adsense-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .adsense-btn {
+      background: var(--accent-cyan);
+      color: var(--text-inverse);
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: none;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Editor Bottom Sponsor Strip */
+    .editor-sponsor-strip {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .sponsor-label {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .sponsor-text {
+      flex: 1;
+    }
+
+    .sponsor-text strong {
+      color: var(--text-primary);
+    }
+
+    .sponsor-link {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-cyan);
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .sponsor-link:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--accent-cyan);
+    }
+
+    /* Below-Workbench SEO & Leaderboard */
+    .seo-docs-section {
+      padding: 2.5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .adsense-leaderboard {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--border-subtle);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .leaderboard-placeholder {
+      min-height: 90px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8125rem;
+    }
+
+    .seo-content h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      color: var(--text-primary);
+    }
+
+    .seo-content p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: 0.9rem;
+    }
+
+    .seo-content code {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+      background: var(--bg-subtle);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Topology Visualizer Canvas */
+    .visualizer-canvas {
+      flex: 1;
+      padding: 2rem 1.5rem;
+      background: var(--editor-bg);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .visualizer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .visualizer-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .flow-pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      max-width: 650px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .flow-node {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .flow-node:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(6, 182, 212, 0.15);
+    }
+
+    .flow-node.active-layer {
+      border-left: 4px solid var(--accent-emerald);
+    }
+
+    .flow-node.bypassed-layer {
+      border-left: 4px solid var(--text-muted);
+      opacity: 0.65;
+    }
+
+    .node-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .node-icon-box {
+      width: 44px;
+      height: 44px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+
+    .node-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .node-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .node-subtext {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .node-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-active {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--accent-emerald);
+    }
+
+    .badge-bypassed {
+      background: rgba(100, 116, 139, 0.12);
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      color: var(--text-muted);
+    }
+
+    /* Flow Connector Arrow */
+    .flow-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      margin: -0.5rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .flow-line {
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-indigo));
+    }
+
+    .flow-arrow-down {
+      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      margin-left: -5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">&gt;_</div>
+      <div class="brand-name">OpsHardener<span>.dev</span></div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active">
+        <span>🛡️</span> Nginx Hardening
+      </button>
+      <button class="nav-tab">
+        <span>🐳</span> Dockerfile Linter
+      </button>
+      <button class="nav-tab">
+        <span>🔐</span> CSP & Headers
+      </button>
+      <button class="nav-tab">
+        <span>☸️</span> K8s Validator
+      </button>
+    </div>
+
+    <div class="header-actions">
+      <div class="privacy-badge">
+        <div class="privacy-dot"></div>
+        100% Client-Side Private
+      </div>
+      <button class="btn-action" style="font-family: 'JetBrains Mono';">GitHub ★</button>
+    </div>
+  </header>
+
+  <!-- Main Split Workbench -->
+  <main>
+    <!-- Left Configuration Controls -->
+    <section class="controls-pane">
+      
+      <!-- Quick Presets -->
+      <div class="preset-bar">
+        <div class="preset-chip active" onclick="setPreset('hardened')">⚡ Hardened Production</div>
+        <div class="preset-chip" onclick="setPreset('spa')">🌐 SPA + API Reverse Proxy</div>
+        <div class="preset-chip" onclick="setPreset('websocket')">🔌 WebSocket High-Load</div>
+      </div>
+
+      <!-- Domain & Listener Card -->
+      <div class="config-card">
+        <div class="card-header">
+          <div class="card-title">🌐 Server & Listener</div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Domain Names</label>
+            <input type="text" id="domainInput" class="cyber-input" value="api.myproductionapp.com" oninput="updateCode()" />
+          </div>
+          <div class="form-row">
+            <div>
+              <div class="form-label">HTTP/2 & HTTP/3 (QUIC)</div>
+              <div class="form-desc">Enable multiplexed binary protocols</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="http2Toggle" checked onchange="updateCode()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SSL & TLS Hardening Card -->
+      <div class="config-card">
+        <div class="card-header">
+          <div class="card-title">🔒 SSL / TLS Hardening</div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Mozilla SSL Profile</label>
+            <div class="segmented-control">
+              <button class="segmented-btn active" id="sslModern" onclick="setSsl('modern')">Modern (TLS 1.3 only)</button>
+              <button class="segmented-btn" id="sslInter" onclick="setSsl('intermediate')">Intermediate (1.2 + 1.3)</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <div class="form-label">HSTS with Preload</div>
+              <div class="form-desc">Enforce strict HTTPS with 2-year max-age</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="hstsToggle" checked onchange="updateCode()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="form-row">
+            <div>
+              <div class="form-label">OCSP Stapling</div>
+              <div class="form-desc">Speeds up TLS handshake and preserves CA privacy</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="ocspToggle" checked onchange="updateCode()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rate Limiting Card -->
+      <div class="config-card">
+        <div class="card-header">
+          <div class="card-title">🛡️ Rate Limiting & DDoS Shield</div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div>
+              <div class="form-label">Per-IP Request Limiting</div>
+              <div class="form-desc">Mitigate brute-force & denial of service</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rateLimitToggle" checked onchange="updateCode()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Requests Per Second</label>
+            <input type="number" id="rateRps" class="cyber-input" value="20" oninput="updateCode()" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Headers Card -->
+      <div class="config-card">
+        <div class="card-header">
+          <div class="card-title">🛡️ OWASP Security Headers</div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div>
+              <div class="form-label">X-Frame-Options (DENY)</div>
+              <div class="form-desc">Clickjacking prevention</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="xFrameToggle" checked onchange="updateCode()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="form-row">
+            <div>
+              <div class="form-label">X-Content-Type-Options</div>
+              <div class="form-desc">MIME sniffing prevention</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="mimeToggle" checked onchange="updateCode()">
+              <span class="slider"></span>
+            </label>
+        </div>
+      </div>
+
+      <!-- Google AdSense Zone 1: Native In-Feed / Sidebar Unit -->
+      <div class="adsense-card">
+        <div class="adsense-header">
+          <span class="adsense-tag">SPONSORED / ADSENSE</span>
+          <span class="adsense-tag">300x250 / Responsive</span>
+        </div>
+        <div class="adsense-body">
+          <div class="adsense-mock-ad">
+            <div class="adsense-icon">⚡</div>
+            <div class="adsense-info">
+              <div class="adsense-title">Deploy Hardened Nginx on DigitalOcean</div>
+              <div class="adsense-desc">Spin up high-speed NVMe droplets with $200 free cloud credits.</div>
+            </div>
+            <button class="adsense-btn">Try Free &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Right Live Monaco/Code Editor Pane -->
+    <section class="code-pane">
+      
+      <!-- Floating Score Badge -->
+      <div class="score-badge-card">
+        <div class="dial-wrapper">
+          <svg class="dial-svg" width="64" height="64">
+            <circle class="dial-bg" cx="32" cy="32" r="28"></circle>
+            <circle id="scoreDialCircle" class="dial-progress" cx="32" cy="32" r="28"></circle>
+          </svg>
+          <div class="dial-text" id="scoreGrade">A+</div>
+        </div>
+        <div class="score-meta">
+          <div class="score-title">Security Score</div>
+          <div class="score-grade" id="scoreNumber">98 / 100</div>
+          <div class="score-status">● OWASP Compliant</div>
+        </div>
+      </div>
+
+      <!-- Editor Topbar Tabs -->
+      <div class="editor-topbar">
+        <div class="file-tabs">
+          <button class="file-tab active" id="tabNginx" onclick="switchTab('nginx')">
+            <span>⚙️</span> nginx.conf
+          </button>
+          <button class="file-tab" id="tabHeaders" onclick="switchTab('headers')">
+            <span>🔒</span> security-headers.conf
+          </button>
+          <button class="file-tab" id="tabDocker" onclick="switchTab('docker')">
+            <span>🐳</span> docker-compose.yml
+          </button>
+          <button class="file-tab" id="tabVisualizer" onclick="switchTab('visualizer')">
+            <span>🗺️</span> Visual Topology
+          </button>
+        </div>
+
+        <div class="editor-actions">
+          <button class="btn-action" id="copyBtn" onclick="copyConfig()">
+            <span id="copyIcon">📋</span> Copy
+          </button>
+          <button class="btn-action" onclick="downloadConfig()">
+            <span>⬇️</span> Download
+          </button>
+          <button class="btn-action btn-primary" onclick="shareUrl()">
+            <span>🔗</span> Share Link
+          </button>
+        </div>
+      </div>
+
+      <!-- Editor Code Content -->
+      <pre class="editor-content" id="codeViewport"></pre>
+
+      <!-- Visualizer Canvas Container -->
+      <div id="visualizerCanvas" class="visualizer-canvas" style="display: none;"></div>
+
+
+      <!-- Google AdSense Zone 2: Editor Bottom Sponsor Strip -->
+      <div class="editor-sponsor-strip">
+        <span class="sponsor-label">PARTNER</span>
+        <span class="sponsor-text">🛡️ Protect this server with automated container vulnerability scanning from <strong>Snyk Security</strong></span>
+        <button class="sponsor-link">Run Free Scan &rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Below-Workbench SEO & Google AdSense Zone 3 (Leaderboard) -->
+  <section class="seo-docs-section">
+    <div class="adsense-leaderboard">
+      <div class="adsense-header" style="justify-content: center; margin-bottom: 0.5rem;">
+        <span class="adsense-tag">ADVERTISEMENT / GOOGLE ADSENSE (728x90 or Responsive)</span>
+      </div>
+      <div class="leaderboard-placeholder">
+        <span>Responsive AdSense Leaderboard Display Banner Area (Zero Layout Shift Reserved Space)</span>
+      </div>
+    </div>
+
+    <div class="seo-content">
+      <h2>Why Harden Nginx with Modern TLS 1.3 and OWASP Headers?</h2>
+      <p>By default, standard Nginx configurations leave server tokens exposed, allow outdated TLS 1.0/1.1 handshakes, and miss critical browser security headers like <code>Content-Security-Policy</code> and <code>Strict-Transport-Security</code> (HSTS). Using OpsHardener.dev, you can generate battle-tested, A+ SSL Labs certified configurations with zero server latency.</p>
+    </div>
+  </section>
+
+
+  <script>
+    let currentTab = 'nginx';
+    let sslMode = 'modern';
+
+    function setSsl(mode) {
+      sslMode = mode;
+      document.getElementById('sslModern').classList.toggle('active', mode === 'modern');
+      document.getElementById('sslInter').classList.toggle('active', mode === 'intermediate');
+      updateCode();
+    }
+
+    function setPreset(preset) {
+      if (preset === 'hardened') {
+        document.getElementById('http2Toggle').checked = true;
+        document.getElementById('hstsToggle').checked = true;
+        document.getElementById('ocspToggle').checked = true;
+        document.getElementById('rateLimitToggle').checked = true;
+        document.getElementById('xFrameToggle').checked = true;
+        document.getElementById('mimeToggle').checked = true;
+        setSsl('modern');
+      } else if (preset === 'spa') {
+        document.getElementById('http2Toggle').checked = true;
+        document.getElementById('rateLimitToggle').checked = false;
+        setSsl('intermediate');
+      }
+      updateCode();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tabNginx').classList.toggle('active', tab === 'nginx');
+      document.getElementById('tabHeaders').classList.toggle('active', tab === 'headers');
+      document.getElementById('tabDocker').classList.toggle('active', tab === 'docker');
+      document.getElementById('tabVisualizer').classList.toggle('active', tab === 'visualizer');
+      
+      const viewport = document.getElementById('codeViewport');
+      const canvas = document.getElementById('visualizerCanvas');
+      if (tab === 'visualizer') {
+        viewport.style.display = 'none';
+        canvas.style.display = 'flex';
+      } else {
+        viewport.style.display = 'block';
+        canvas.style.display = 'none';
+      }
+      updateCode();
+    }
+
+    function updateCode() {
+      const domain = document.getElementById('domainInput').value || 'example.com';
+      const http2 = document.getElementById('http2Toggle').checked;
+      const hsts = document.getElementById('hstsToggle').checked;
+      const ocsp = document.getElementById('ocspToggle').checked;
+      const rateLimit = document.getElementById('rateLimitToggle').checked;
+      const rps = document.getElementById('rateRps').value || '20';
+      const xframe = document.getElementById('xFrameToggle').checked;
+      const mime = document.getElementById('mimeToggle').checked;
+
+      // Calculate score
+      let score = 50;
+      if (sslMode === 'modern') score += 15; else score += 10;
+      if (hsts) score += 15;
+      if (ocsp) score += 10;
+      if (rateLimit) score += 10;
+      if (xframe) score += 5;
+      if (mime) score += 5;
+
+      const scoreCircle = document.getElementById('scoreDialCircle');
+      const scoreGrade = document.getElementById('scoreGrade');
+      const scoreNumber = document.getElementById('scoreNumber');
+
+      scoreNumber.innerText = `${score} / 100`;
+      scoreGrade.innerText = score >= 90 ? 'A+' : score >= 80 ? 'A' : score >= 70 ? 'B' : 'C';
+      
+      const circumference = 2 * Math.PI * 28; // ~175.9
+      const offset = circumference - (score / 100) * circumference;
+      scoreCircle.style.strokeDashoffset = offset;
+
+      const viewport = document.getElementById('codeViewport');
+      const canvas = document.getElementById('visualizerCanvas');
+
+      if (currentTab === 'visualizer') {
+        canvas.innerHTML = `
+          <div class="visualizer-header">
+            <div class="visualizer-title">🗺️ Request Pipeline & Traffic Topology</div>
+            <div style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-secondary);">Target: <span style="color: var(--accent-cyan);">${domain}</span></div>
+          </div>
+
+          <div class="flow-pipeline">
+            <!-- Node 1: Client Request -->
+            <div class="flow-node active-layer">
+              <div class="node-left">
+                <div class="node-icon-box">🌐</div>
+                <div class="node-meta">
+                  <div class="node-label">1. Client Request (Ingress)</div>
+                  <div class="node-subtext">https://${domain} &middot; Port 443 ${http2 ? '(HTTP/2 Multiplexed)' : '(HTTP/1.1)'}</div>
+                </div>
+              </div>
+              <span class="node-badge badge-active">INGRESS ACTIVE</span>
+            </div>
+
+            <div class="flow-connector">
+              <div class="flow-line"></div>
+              <div class="flow-arrow-down">&#9660;</div>
+            </div>
+
+            <!-- Node 2: TLS Termination -->
+            <div class="flow-node active-layer">
+              <div class="node-left">
+                <div class="node-icon-box">🔒</div>
+                <div class="node-meta">
+                  <div class="node-label">2. SSL/TLS Termination Layer</div>
+                  <div class="node-subtext">Mozilla Profile: ${sslMode.toUpperCase()} (${sslMode === 'modern' ? 'TLS 1.3 Only' : 'TLS 1.2 + 1.3'})${ocsp ? ' + OCSP Stapling' : ''}</div>
+                </div>
+              </div>
+              <span class="node-badge badge-active">ENCRYPTED (A+)</span>
+            </div>
+
+            <div class="flow-connector">
+              <div class="flow-line"></div>
+              <div class="flow-arrow-down">&#9660;</div>
+            </div>
+
+            <!-- Node 3: DDoS & Rate Limiting -->
+            <div class="flow-node ${rateLimit ? 'active-layer' : 'bypassed-layer'}">
+              <div class="node-left">
+                <div class="node-icon-box">🛡️</div>
+                <div class="node-meta">
+                  <div class="node-label">3. DDoS & Rate Limiting Shield</div>
+                  <div class="node-subtext">${rateLimit ? `Limit: ${rps} req/s per binary IP | Burst: 10 nodelay (HTTP 429)` : 'Disabled / Direct Pass-through'}</div>
+                </div>
+              </div>
+              <span class="node-badge ${rateLimit ? 'badge-active' : 'badge-bypassed'}">${rateLimit ? 'SHIELD ACTIVE' : 'BYPASSED'}</span>
+            </div>
+
+            <div class="flow-connector">
+              <div class="flow-line"></div>
+              <div class="flow-arrow-down">&#9660;</div>
+            </div>
+
+            <!-- Node 4: Security Headers Filter -->
+            <div class="flow-node ${hsts || xframe || mime ? 'active-layer' : 'bypassed-layer'}">
+              <div class="node-left">
+                <div class="node-icon-box">📑</div>
+                <div class="node-meta">
+                  <div class="node-label">4. OWASP Security Headers Injection</div>
+                  <div class="node-subtext">${[hsts ? 'HSTS (2y Preload)' : null, xframe ? 'X-Frame: DENY' : null, mime ? 'X-Content-Type: nosniff' : null, 'CSP'].filter(Boolean).join(', ')}</div>
+                </div>
+              </div>
+              <span class="node-badge badge-active">HEADERS INJECTED</span>
+            </div>
+
+            <div class="flow-connector">
+              <div class="flow-line"></div>
+              <div class="flow-arrow-down">&#9660;</div>
+            </div>
+
+            <!-- Node 5: Reverse Proxy Upstream -->
+            <div class="flow-node active-layer">
+              <div class="node-left">
+                <div class="node-icon-box">🚀</div>
+                <div class="node-meta">
+                  <div class="node-label">5. Upstream Service (Proxy Pass)</div>
+                  <div class="node-subtext">http://127.0.0.1:3000 &middot; X-Forwarded-For & X-Real-IP Passed</div>
+                </div>
+              </div>
+              <span class="node-badge badge-active">UPSTREAM LIVE</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentTab === 'nginx') {
+        viewport.innerHTML = 
+`<span class="syn-comment"># =========================================================================
+# Hardened Nginx Production Configuration — OpsHardener.dev
+# Domain: ${domain} | SSL Profile: ${sslMode.toUpperCase()}
+# =========================================================================</span>
+
+<span class="syn-keyword">user</span> nginx;
+<span class="syn-keyword">pid</span> /var/run/nginx.pid;
+<span class="syn-keyword">worker_processes</span> auto;
+<span class="syn-keyword">worker_rlimit_nofile</span> <span class="syn-number">65535</span>;
+
+<span class="syn-keyword">events</span> {
+    <span class="syn-directive">multi_accept</span> on;
+    <span class="syn-directive">worker_connections</span> <span class="syn-number">8192</span>;
+}
+
+<span class="syn-keyword">http</span> {
+    <span class="syn-directive">charset</span> utf-8;
+    <span class="syn-directive">sendfile</span> on;
+    <span class="syn-directive">tcp_nopush</span> on;
+    <span class="syn-directive">tcp_nodelay</span> on;
+    <span class="syn-directive">server_tokens</span> off;
+
+    <span class="syn-comment"># MIME types</span>
+    <span class="syn-keyword">include</span> /etc/nginx/mime.types;
+    <span class="syn-directive">default_type</span> application/octet-stream;
+${rateLimit ? `\n    <span class="syn-comment"># Rate Limiting Zone (DDoS & Brute-force shield)</span>\n    <span class="syn-directive">limit_req_zone</span> $binary_remote_addr zone=ip_limit:10m rate=${rps}r/s;\n    <span class="syn-directive">limit_req_status</span> <span class="syn-number">429</span>;` : ''}
+
+    <span class="syn-comment"># HTTP -> HTTPS Redirect</span>
+    <span class="syn-keyword">server</span> {
+        <span class="syn-directive">listen</span> <span class="syn-number">80</span>;
+        <span class="syn-directive">listen</span> [::]:<span class="syn-number">80</span>;
+        <span class="syn-directive">server_name</span> ${domain};
+        <span class="syn-keyword">return</span> <span class="syn-number">301</span> https://$host$request_uri;
+    }
+
+    <span class="syn-comment"># Hardened HTTPS Server Block</span>
+    <span class="syn-keyword">server</span> {
+        <span class="syn-directive">listen</span> <span class="syn-number">443</span> ssl ${http2 ? 'http2' : ''};
+        <span class="syn-directive">listen</span> [::]:<span class="syn-number">443</span> ssl ${http2 ? 'http2' : ''};
+        <span class="syn-directive">server_name</span> ${domain};
+
+        <span class="syn-comment"># SSL / TLS Certificates & Ciphers</span>
+        <span class="syn-directive">ssl_certificate</span> /etc/letsencrypt/live/${domain}/fullchain.pem;
+        <span class="syn-directive">ssl_certificate_key</span> /etc/letsencrypt/live/${domain}/privkey.pem;
+        <span class="syn-directive">ssl_protocols</span> ${sslMode === 'modern' ? 'TLSv1.3;' : 'TLSv1.2 TLSv1.3;'}${ocsp ? `\n        <span class="syn-directive">ssl_stapling</span> on;\n        <span class="syn-directive">ssl_stapling_verify</span> on;` : ''}
+
+        <span class="syn-comment"># Security Headers</span>
+        <span class="syn-keyword">include</span> /etc/nginx/security-headers.conf;
+
+        <span class="syn-keyword">location</span> / {
+${rateLimit ? `            <span class="syn-directive">limit_req</span> zone=ip_limit burst=10 nodelay;\n` : ''}            <span class="syn-directive">proxy_pass</span> http://127.0.0.1:3000;
+            <span class="syn-directive">proxy_http_version</span> 1.1;
+            <span class="syn-directive">proxy_set_header</span> Upgrade $http_upgrade;
+            <span class="syn-directive">proxy_set_header</span> Connection "upgrade";
+            <span class="syn-directive">proxy_set_header</span> Host $host;
+            <span class="syn-directive">proxy_set_header</span> X-Real-IP $remote_addr;
+            <span class="syn-directive">proxy_set_header</span> X-Forwarded-For $proxy_add_x_forwarded_for;
+            <span class="syn-directive">proxy_set_header</span> X-Forwarded-Proto $scheme;
+        }
+    }
+}`;
+      } else if (currentTab === 'headers') {
+        viewport.innerHTML = 
+`<span class="syn-comment"># /etc/nginx/security-headers.conf
+# OWASP Top 10 Recommended Headers</span>
+
+${hsts ? `<span class="syn-directive">add_header</span> Strict-Transport-Security <span class="syn-string">"max-age=63072000; includeSubDomains; preload"</span> always;` : ''}
+${xframe ? `<span class="syn-directive">add_header</span> X-Frame-Options <span class="syn-string">"DENY"</span> always;` : ''}
+${mime ? `<span class="syn-directive">add_header</span> X-Content-Type-Options <span class="syn-string">"nosniff"</span> always;` : ''}
+<span class="syn-directive">add_header</span> Referrer-Policy <span class="syn-string">"strict-origin-when-cross-origin"</span> always;
+<span class="syn-directive">add_header</span> Permissions-Policy <span class="syn-string">"camera=(), microphone=(), geolocation=()"</span> always;
+<span class="syn-directive">add_header</span> Content-Security-Policy <span class="syn-string">"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;"</span> always;`;
+      } else if (currentTab === 'docker') {
+        viewport.innerHTML = 
+`<span class="syn-comment"># docker-compose.yml for Production Hardened Nginx</span>
+<span class="syn-keyword">version</span>: <span class="syn-string">'3.8'</span>
+
+<span class="syn-keyword">services</span>:
+  <span class="syn-directive">nginx</span>:
+    <span class="syn-keyword">image</span>: nginx:alpine
+    <span class="syn-keyword">restart</span>: unless-stopped
+    <span class="syn-keyword">ports</span>:
+      - <span class="syn-string">"80:80"</span>
+      - <span class="syn-string">"443:443"</span>
+    <span class="syn-keyword">volumes</span>:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./security-headers.conf:/etc/nginx/security-headers.conf:ro
+      - ./certs:/etc/letsencrypt:ro
+    <span class="syn-keyword">security_opt</span>:
+      - no-new-privileges:true
+    <span class="syn-keyword">cap_drop</span>:
+      - ALL
+    <span class="syn-keyword">cap_add</span>:
+      - NET_BIND_SERVICE`;
+      }
+    }
+
+
+    function copyConfig() {
+      const text = document.getElementById('codeViewport').innerText;
+      navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copyBtn');
+      btn.innerHTML = '<span>✅</span> Copied!';
+      btn.style.borderColor = 'var(--accent-emerald)';
+      setTimeout(() => {
+        btn.innerHTML = '<span>📋</span> Copy';
+        btn.style.borderColor = 'var(--border-subtle)';
+      }, 2000);
+    }
+
+    function downloadConfig() {
+      const filename = currentTab === 'nginx' ? 'nginx.conf' : currentTab === 'headers' ? 'security-headers.conf' : 'docker-compose.yml';
+      const text = document.getElementById('codeViewport').innerText;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+    }
+
+    function shareUrl() {
+      alert('State serialized into URL hash! Anyone opening your link will get this exact configuration.');
+    }
+
+    // Initialize
+    updateCode();
+  </script>
+</body>
+</html>
