@@ -1,0 +1,6 @@
+# OpsHardener.dev - 100% Client-Side DevOps & Cybersecurity Studio
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://opshardener.dev/sitemap.xml

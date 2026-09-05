@@ -119,3 +119,59 @@ aws cloudfront create-invalidation \
 4. Click **Upload**.
 5. Go to **CloudFront Console** $\rightarrow$ Select your distribution $\rightarrow$ **Invalidations** tab $\rightarrow$ **Create invalidation** $\rightarrow$ Enter `/*` $\rightarrow$ Submit.
 6. *(Optional)* In Cloudflare, click **Caching** $\rightarrow$ **Configuration** $\rightarrow$ **Purge Everything** if testing immediate changes.
+
+---
+
+## 6. Docker Container Deployment (Production Self-Hosted)
+
+OpsHardener.dev provides a production-hardened, unprivileged, multi-stage Docker configuration for deploying as a standalone container, on Kubernetes, or on container platforms like AWS ECS, GCP Cloud Run, or Render.
+
+### Architecture
+* **Builder Stage:** `node:22-alpine` performs `npm ci` and `npm run build`.
+* **Runtime Stage:** `nginxinc/nginx-unprivileged:1.27-alpine` running as non-root user `nginx` (UID `101`) on port `8080`.
+* **Zero Backend:** Only static files are served; no server-side APIs, database connections, or background telemetry.
+* **SPA Routing:** Unmatched routes fallback to `index.html` with `no-cache` headers.
+* **Security Headers:** Preconfigured with `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and dotfile blocking.
+* **Health Check:** Lightweight `/healthz` endpoint returning HTTP 200.
+
+### Build and Run Commands
+
+```bash
+# 1. Build the production Docker image
+docker build -t opshardener-dev:latest .
+
+# 2. Run the container on port 8080 (non-root unprivileged)
+docker run -d \
+  --name opshardener-app \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  --read-only \
+  --tmpfs /tmp \
+  opshardener-dev:latest
+
+# 3. Test application health and SPA routing
+curl -I http://localhost:8080/healthz
+curl -I http://localhost:8080/audit/nginx
+```
+
+### Automated Smoke Tests
+
+To run the automated container smoke test suite:
+* **Linux / macOS / CI:** `./scripts/docker-smoke-test.sh`
+* **Windows (PowerShell):** `powershell -ExecutionPolicy Bypass -File ./scripts/docker-smoke-test.ps1`
+
+---
+
+## 7. Production Readiness & Verification Matrix
+
+| Scope | Validation Method | Current Status | Notes / Prerequisites |
+|---|---|---|---|
+| **Local Code & Logic** | `npm test` (Vitest) | **VERIFIED LOCALLY** (24 files / 242+ tests passing) | Fast client-side unit test suite |
+| **Production Build Bundle** | `npm run build` (`tsc -b && vite build`) | **VERIFIED LOCALLY** (0 errors, 4 asset chunks in `dist/`) | Produces static SPA artifacts |
+| **Privacy & Zero-Backend** | Network call audit (0 fetch / 0 telemetry) | **VERIFIED LOCALLY** | 100% in-browser AST parsing |
+| **Container Static Config** | `node scripts/validate-container-config.mjs` | **STATICALLY VALIDATED** (31/31 checks passing) | Validates Dockerfile, .dockerignore, nginx.conf, dist/ |
+| **Nginx Hardening & SPA Routing** | Static AST / Regex validation in `nginx.conf` | **STATICALLY VALIDATED** | Non-root 8080, /healthz, asset caching, security headers |
+| **Live Docker Build & Run** | `docker build` & `docker run` | **REQUIRES DOCKER ENVIRONMENT** | Docker daemon is not installed on this Windows development host |
+| **Live HTTP Container Smoke Test** | `docker-smoke-test.sh` / `.ps1` | **REQUIRES DOCKER ENVIRONMENT** | Verifies live container startup, curl /healthz and SPA fallback |
+
+

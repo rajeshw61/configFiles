@@ -1,0 +1,40 @@
+# Dependencies & package management
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Git & repository metadata
+.git/
+.gitignore
+.gitattributes
+
+# Test output & test artifacts
+coverage/
+.nyc_output/
+*.test.ts
+*.spec.ts
+src/__tests__/
+
+# Local IDE & editor configuration
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build artifacts & TypeScript caches
+dist/
+*.tsbuildinfo
+
+# Documentation, blueprints & sample files
+*.md
+design-preview.html
+samples/
+nginx_docker.zip
+
+# Customization & agent instructions
+.agents/
